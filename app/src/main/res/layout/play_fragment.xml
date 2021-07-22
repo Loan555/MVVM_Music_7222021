@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.fragment.PlayFragment">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.loan555.mvvm_musicapp.ui.viewmodel.AppViewModel" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/image"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_marginTop="40dp"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintBottom_toTopOf="@id/seek_bar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/img_src"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/musical_note_icon" />
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- TODO: Update blank fragment layout -->
+
+            <SeekBar
+                android:id="@+id/seek_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:max="@{viewModel.duration}"
+                android:progress="@{viewModel.current}"
+                app:layout_constraintBottom_toTopOf="@id/nameItem"
+                app:layout_constraintTop_toBottomOf="@id/image" />
+
+            <TextView
+                android:id="@+id/time_draw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.timeCurrent}"
+                app:layout_constraintLeft_toLeftOf="@id/seek_bar"
+                app:layout_constraintTop_toBottomOf="@id/seek_bar" />
+
+            <TextView
+                android:id="@+id/time_sum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.timeMax}"
+                app:layout_constraintRight_toRightOf="@id/seek_bar"
+                app:layout_constraintTop_toBottomOf="@id/seek_bar" />
+
+            <View
+                android:id="@+id/loop"
+                android:layout_width="24dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/ic_repeat"
+                android:onClick="@{()->viewModel.loopClick()}"
+                app:layout_constraintBottom_toBottomOf="@id/viewCard"
+                app:layout_constraintRight_toRightOf="@id/skip_back_play"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/viewCard" />
+
+            <ImageButton
+                android:id="@+id/skip_back_play"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/ic_skip_previous"
+                android:onClick="@{()->viewModel.sentActionMusic(-2)}"
+                app:layout_constraintBottom_toBottomOf="@id/viewCard"
+                app:layout_constraintLeft_toRightOf="@id/loop"
+                app:layout_constraintRight_toLeftOf="@id/viewCard"
+                app:layout_constraintTop_toTopOf="@id/viewCard" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/viewCard"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:onClick="@{()->viewModel.sentActionMusic(4)}"
+                app:cardCornerRadius="24dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/nameItem">
+
+                <View
+                    android:id="@+id/play"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/ic_pause" />
+
+            </androidx.cardview.widget.CardView>
+
+            <View
+                android:id="@+id/btnDownload"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/ic_download"
+                app:layout_constraintBottom_toTopOf="@id/like_btn"
+                app:layout_constraintLeft_toLeftOf="@id/like_btn" />
+
+            <View
+                android:id="@+id/skip_next_play"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/ic_skip_next"
+                android:onClick="@{()->viewModel.sentActionMusic(2)}"
+                app:layout_constraintBottom_toBottomOf="@id/viewCard"
+                app:layout_constraintLeft_toRightOf="@id/viewCard"
+                app:layout_constraintRight_toLeftOf="@id/like_btn"
+                app:layout_constraintTop_toTopOf="@id/viewCard" />
+
+            <View
+                android:id="@+id/like_btn"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginRight="50dp"
+                android:background="@drawable/ic_favorite"
+                android:onClick="@{()->viewModel.btnFavoriteClick()}"
+                app:layout_constraintBottom_toBottomOf="@id/viewCard"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/skip_next_play"
+                app:layout_constraintTop_toTopOf="@id/viewCard" />
+
+            <LinearLayout
+                android:id="@+id/nameItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="10dp"
+                app:layout_constraintBottom_toTopOf="@id/viewCard"
+                app:layout_constraintTop_toBottomOf="@id/seek_bar">
+
+                <TextView
+                    android:id="@+id/nameSong"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingBottom="20dp"
+                    android:text="@{viewModel.title}"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/nameSinger"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@{viewModel.artistsNames}"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnLoadSongRelate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:orientation="horizontal"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/like_btn">
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:src="@drawable/ic_load" />
+
+                    <ProgressBar
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:visibility="gone" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Bài hát liên quan"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycleView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnLoadSongRelate" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</layout>
