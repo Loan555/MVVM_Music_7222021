@@ -25,7 +25,7 @@
             android:parentActivityName=".ui.activity.MainActivity" />
         <activity
             android:name=".ui.activity.MainActivity"
-            android:label="Trang chủ">
+            android:label="Nhạc của tôi">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
