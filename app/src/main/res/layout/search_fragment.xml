@@ -5,7 +5,7 @@
     android:id="@+id/search"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".search.searchFragment">
+    tools:context=".ui.search.SearchFragment">
 
     <TextView
         android:id="@+id/message"

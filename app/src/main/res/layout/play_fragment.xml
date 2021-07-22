@@ -136,7 +136,6 @@
                 android:layout_height="24dp"
                 android:layout_marginRight="50dp"
                 android:background="@drawable/ic_favorite"
-                android:onClick="@{()->viewModel.btnFavoriteClick()}"
                 app:layout_constraintBottom_toBottomOf="@id/viewCard"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/skip_next_play"
@@ -178,6 +177,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="5dp"
+                android:onClick="@{()->viewModel.setCurrentPager(1)}"
                 android:orientation="horizontal"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/like_btn">
@@ -190,13 +190,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@color/white"
-                        android:src="@drawable/ic_load" />
-
-                    <ProgressBar
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_gravity="center"
-                        android:visibility="gone" />
+                        android:src="@drawable/ic_queue_music" />
 
                 </FrameLayout>
 
@@ -207,15 +201,6 @@
                     android:text="Bài hát liên quan"
                     android:textStyle="bold" />
             </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycleView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnLoadSongRelate" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>

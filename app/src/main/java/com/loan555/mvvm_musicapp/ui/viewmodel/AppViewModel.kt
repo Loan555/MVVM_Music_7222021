@@ -17,6 +17,7 @@ import com.loan555.mvvm_musicapp.model.Playlist
 import com.loan555.mvvm_musicapp.model.SongCustom
 import com.loan555.mvvm_musicapp.repository.ChartRepository
 import com.loan555.mvvm_musicapp.repository.OfflineRepository
+import com.loan555.mvvm_musicapp.repository.RelatedRepository
 import com.loan555.mvvm_musicapp.repository.SongRepository
 import com.loan555.mvvm_musicapp.ui.fragment.myTag
 import kotlinx.coroutines.Dispatchers
@@ -34,8 +35,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val songRepository: SongRepository = SongRepository(application)
     private val chartRepository = ChartRepository()
     private val offlineRepository = OfflineRepository(application)
+    private val relateRepository = RelatedRepository()
 
-    fun insertSong(song: SongCustom) = viewModelScope.launch {
+    private fun insertSong(song: SongCustom) = viewModelScope.launch {
         songRepository.insertSong(song)
     }
 
@@ -56,6 +58,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun loadAllSongOffline(): LiveData<List<SongCustom>> = offlineRepository.getAllSongOffline()
 
     fun getAllSongOffline(): LiveData<List<SongCustom>> = offlineRepository.getList()
+
+    fun getRelateSong() = relateRepository.relateList
+
+    fun loadRelate(id: String) = relateRepository.loadAllSongRelate(id)
 
     /**
      * service
@@ -132,8 +138,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun playSong(list: Playlist, p: Int) {
         if (mBinder.value != null) {
-            if (list.id != mBinder.value?.getService()?.listPlaying) {
-                mBinder.value!!.getService().songs = list.songs as MutableList<SongCustom>
+            when (list.id) {
+                mBinder.value?.getService()?.listPlaying, "Playing" -> {
+
+                }
+                else -> {
+                    mBinder.value!!.getService().songs = list.songs as MutableList<SongCustom>
+                    songsPlaying.value = list.songs
+                }
             }
             mBinder.value!!.getService().playSong(p)
         } else Log.e(myTag, "service not connect mBinder.value = ${mBinder.value}")
@@ -193,6 +205,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val _isFavorite = MutableLiveData<Boolean>().apply { value = false }
     val isFavorite: LiveData<Boolean> = _isFavorite
 
+
     private val _title = MutableLiveData<String>().apply { value = "" }
     private val _artistsNames = MutableLiveData<String>().apply { value = "" }
     private val _timeMax = MutableLiveData<String>().apply { value = "00:00" }
@@ -208,6 +221,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val statePlay: LiveData<Int> = _statePlay
     val duration: LiveData<Int> = _duration
     val current: LiveData<Int> = _current
+    val currentPager = MutableLiveData<Int>().apply { value = 0 }
+
+    val songsPlaying = MutableLiveData<List<SongCustom>>()
+
+    fun setCurrentPager(pager: Int) {
+        currentPager.value = pager
+    }
 
     fun postTimeToSeekbar(timeCurrent: Int) {
         _current.value = timeCurrent
@@ -251,10 +271,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         _statePlay.value = mBinder.value!!.getService().statePlay
     }
 
-    fun btnFavoriteClick() {
+    fun handSongsPlaying() {
+        if (mBinder.value != null) {
+            songsPlaying.value = mBinder.value!!.getService().songs
+        }
+    }
+
+    fun btnFavoriteClick(song: SongCustom) {
         try {
-            val song = mBinder.value!!.getService().songs[mBinder.value!!.getService().songPos]
             insertSong(song)
+            mBinder.value!!.getService().songs[mBinder.value!!.getService().songPos].favorite =
+                true
+            _isFavorite.value = true
             Toast.makeText(getApplication, "Thêm vào yêu thích", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Log.e(myTag, "error btnFavoriteClick : ${e.message}")

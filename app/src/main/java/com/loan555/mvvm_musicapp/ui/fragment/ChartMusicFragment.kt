@@ -65,11 +65,12 @@ class ChartMusicFragment : Fragment() {
 
     private fun initEvent() {
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.loadAllSongChart()
+            initData()
         }
     }
 
     private fun initData() {
+        binding.swipeRefresh.isRefreshing = true
         viewModel.loadAllSongChart()
     }
 
@@ -79,5 +80,4 @@ class ChartMusicFragment : Fragment() {
         val intent = Intent(this.requireContext(), PlaySongActivity::class.java)
         startActivity(intent)
     }
-
 }

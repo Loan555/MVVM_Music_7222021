@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:paddingTop="20dp"
-            android:text="@{viewModel.text}"
+            android:text="Bảng xếp hạng #Zing"
             android:textStyle="bold" />
 
         <TextView

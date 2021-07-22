@@ -1,6 +1,7 @@
 package com.loan555.mvvm_musicapp.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -86,11 +87,33 @@ class PlayFragment : Fragment() {
         binding.btnDownload.setOnClickListener {
             val songPlaying =
                 viewModel.mBinder.value!!.getService().songs[viewModel.mBinder.value!!.getService().songPos]
-            if (songPlaying.thumbnail != null)
+            if (songPlaying.thumbnail != null) {
                 songPlaying.downLoad(requireContext())
-            else Toast.makeText(this.context, "Bài hát đã có trong thiết bị", Toast.LENGTH_SHORT)
+            } else Toast.makeText(this.context, "Bài hát đã có trong thiết bị", Toast.LENGTH_SHORT)
                 .show()
         }
+        binding.likeBtn.setOnClickListener {
+            if (viewModel.getBinder().value != null) {
+                val song = viewModel.getBinder().value!!.getService().songPlaying.value
+                if (song != null) {
+                    viewModel.loadAllSongFavorite().observe(viewLifecycleOwner, { list ->
+                        if (list != null) {
+                            val find = list.find {
+                                it.id == song.id
+                            }
+                            if (find == null) {
+                                viewModel.btnFavoriteClick(song)
+                            } else Toast.makeText(
+                                this.context,
+                                "Bài hát đã co trong danh sách yêu thích",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    })
+                }
+            }
+        }
+
         var currentProcess = 0
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {

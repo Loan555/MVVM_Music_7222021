@@ -1,8 +1,11 @@
 package com.loan555.mvvm_musicapp.ui.activity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.RingtoneManager
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +13,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -19,6 +24,9 @@ import androidx.viewpager.widget.ViewPager
 import com.loan555.musicapplication.service.MusicControllerService
 import com.loan555.mvvm_musicapp.R
 import com.loan555.mvvm_musicapp.databinding.ActivityMainBinding
+import com.loan555.mvvm_musicapp.model.Playlist
+import com.loan555.mvvm_musicapp.model.SongCustom
+import com.loan555.mvvm_musicapp.ui.SearchActivity
 import com.loan555.mvvm_musicapp.ui.fragment.*
 import com.loan555.mvvm_musicapp.ui.viewmodel.AppViewModel
 
@@ -35,6 +43,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var mService: MusicControllerService? = null
+
+    private val resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = it.data
+                doPlay(data)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +79,7 @@ class MainActivity : AppCompatActivity() {
                 mService = null
             }
         })
+
     }
 
     override fun onStart() {
@@ -87,13 +104,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.btnSearch->{
+            R.id.btnSearch -> {
                 startSearchActivity()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_toolbar, menu)
+        return true
     }
 
     override fun onRequestPermissionsResult(
@@ -122,8 +144,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startSearchActivity() {
+    private fun doPlay(data: Intent?) {
+        val bundle = data?.getBundleExtra("bundle")
+        if (bundle != null) {
+            val result = bundle.getSerializable("songSearch") as SongCustom
+            val playList = Playlist("SHEARCH", "Search", null, listOf(result))
+            viewModel.playSong(playList, 0)
+            val intent = Intent(this, PlaySongActivity::class.java)
+            startActivity(intent)
+        }
+    }
 
+    private fun startSearchActivity() {
+        val intent = Intent(this, SearchActivity::class.java)
+        resultLauncher.launch(intent)
     }
 
     private fun intiViewPager() {

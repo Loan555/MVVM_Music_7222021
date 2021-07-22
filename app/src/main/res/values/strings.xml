@@ -10,4 +10,7 @@
     <string name="channel_description">channel_description</string>
     <string name="title_favorite">Yêu thích</string>
     <string name="title_download">Nhạc offline</string>
+    <string name="search_hint">Tên bài hát</string>
+    <string name="vu_t_l_m_m_i"><![CDATA[<Vuốt để làm mới>]]></string>
+    <string name="g_i">Gợi ý</string>
 </resources>

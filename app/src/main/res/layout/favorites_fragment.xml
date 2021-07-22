@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:paddingTop="20dp"
-            android:text="@{viewModel.text}"
+            android:text="Nhạc yêu thích"
             android:textStyle="bold" />
 
         <TextView
