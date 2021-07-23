@@ -1,18 +1,26 @@
 package com.loan555.mvvm_musicapp.ui.fragment
 
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.util.Size
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
+import com.bumptech.glide.Glide
 import com.loan555.mvvm_musicapp.R
 import com.loan555.mvvm_musicapp.databinding.PlayFragmentBinding
+import com.loan555.mvvm_musicapp.model.SongCustom
 import com.loan555.mvvm_musicapp.ui.viewmodel.AppViewModel
+import java.io.IOException
 import java.lang.Exception
 
 class PlayFragment : Fragment() {

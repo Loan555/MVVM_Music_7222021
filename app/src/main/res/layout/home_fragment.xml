@@ -30,8 +30,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/title"
             android:gravity="center"
-            android:text="@{viewModel.size}"
-            android:textStyle="bold" />
+            android:text="@{viewModel.text}"
+            android:textSize="12sp"
+            android:textStyle="italic" />
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefresh"

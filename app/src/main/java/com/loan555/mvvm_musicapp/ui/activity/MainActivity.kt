@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.RingtoneManager
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,7 +11,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -26,7 +23,6 @@ import com.loan555.mvvm_musicapp.R
 import com.loan555.mvvm_musicapp.databinding.ActivityMainBinding
 import com.loan555.mvvm_musicapp.model.Playlist
 import com.loan555.mvvm_musicapp.model.SongCustom
-import com.loan555.mvvm_musicapp.ui.SearchActivity
 import com.loan555.mvvm_musicapp.ui.fragment.*
 import com.loan555.mvvm_musicapp.ui.viewmodel.AppViewModel
 
@@ -175,7 +171,7 @@ class MainActivity : AppCompatActivity() {
                 when (position) {
                     0 -> {
                         binding.navView.menu.findItem(R.id.navigation_offline).isChecked = true
-                        supportActionBar?.setTitle(R.string.title_home)
+                        supportActionBar?.setTitle(R.string.title_offline)
                     }
                     1 -> {
                         binding.navView.menu.findItem(R.id.navigation_chart).isChecked = true
@@ -183,7 +179,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     2 -> {
                         binding.navView.menu.findItem(R.id.navigation_favorite).isChecked = true
-                        supportActionBar?.setTitle(R.string.title_offline)
+                        supportActionBar?.setTitle(R.string.title_favorite)
                     }
                 }
             }

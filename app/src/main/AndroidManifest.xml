@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
 
     <application
         android:name="com.loan555.musicapplication.channel.MyApplication"
@@ -16,16 +17,16 @@
         android:theme="@style/Theme.MVVM_MusicApp"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.SearchActivity"
-            android:label=""
+            android:name=".ui.activity.SearchActivity"
+            android:label="Search"
             android:parentActivityName=".ui.activity.MainActivity"></activity>
         <activity
-            android:label="Play"
             android:name=".ui.activity.PlaySongActivity"
+            android:label="Play"
             android:parentActivityName=".ui.activity.MainActivity" />
         <activity
             android:name=".ui.activity.MainActivity"
-            android:label="Nhạc của tôi">
+            android:label="Nhạc">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

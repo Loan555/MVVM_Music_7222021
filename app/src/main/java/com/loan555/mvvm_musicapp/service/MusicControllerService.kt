@@ -14,7 +14,6 @@ import android.os.Handler
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
 import com.loan555.mvvm_musicapp.R
@@ -36,7 +35,6 @@ const val ACTION_PLAY_PAUSE = 4
 const val CHANNEL_ID = "channel_music_app"
 const val ONGOING_NOTIFICATION_ID = 1
 const val ACTION_MUSIC = "android.intent.action.MY_MUSIC_ACTION"
-const val ACTION_MUSIC_NOTIFICATION = "android.intent.action.MY_MUSIC_ACTION_NOTY"
 const val KEY_ACTION_MUSIC = "action_music"
 
 class MusicControllerService : Service() {
@@ -269,7 +267,6 @@ class MusicControllerService : Service() {
     }
 
     private fun playPrev(): String? {
-        Toast.makeText(this, "back", Toast.LENGTH_SHORT).show()
         songPos--
         if (songPos == -1) songPos = songs.size - 1;
         this.playSong(songPos)

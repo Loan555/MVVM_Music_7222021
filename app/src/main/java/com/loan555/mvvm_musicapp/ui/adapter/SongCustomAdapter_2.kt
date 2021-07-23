@@ -10,6 +10,7 @@ import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -20,32 +21,35 @@ import com.loan555.mvvm_musicapp.model.SongCustom
 import com.loan555.mvvm_musicapp.ui.fragment.myTag
 import java.io.IOException
 
-class SongAdapter(
+class SongCustomAdapter_2(
     private val context: Context,
     private val application: Application?,
-    private val onClick: (Int, List<SongCustom>) -> Unit
+    private val onClick: (Int, List<SongCustom>) -> Unit,
+    private val onDetailClick: (Int, List<SongCustom>,view: View) -> Unit
 ) :
-    RecyclerView.Adapter<SongAdapter.NoteViewHolder>() {
+    RecyclerView.Adapter<SongCustomAdapter_2.NoteViewHolder>() {
     private var list: List<SongCustom> = listOf()
 
     inner class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val txtName: TextView = itemView.findViewById(R.id.song_name)
-        private val layoutItem: ConstraintLayout = itemView.findViewById(R.id.layoutItemSong)
         private val imgNote: ImageView = itemView.findViewById(R.id.img_song)
         private val artist: TextView = itemView.findViewById(R.id.artists_names)
         private val time: TextView = itemView.findViewById(R.id.duration)
+        private val btnMoreClick: ImageButton = itemView.findViewById(R.id.btnMore)
+        private val layoutItem: ConstraintLayout = itemView.findViewById(R.id.layoutItemSong)
         fun onBind(song: SongCustom) {
             txtName.text = song.title
             artist.text = song.artistsNames
             time.text = song.timeToString()
             loadImg(song, imgNote)
             layoutItem.setOnClickListener { onClick(layoutPosition, list) }
+            btnMoreClick.setOnClickListener { onDetailClick(layoutPosition, list, btnMoreClick) }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val itemView =
-            LayoutInflater.from(context).inflate(R.layout.song_adapter, parent, false)
+            LayoutInflater.from(context).inflate(R.layout.song_custom_adapter_2, parent, false)
         return NoteViewHolder(itemView)
     }
 
@@ -83,4 +87,5 @@ class SongAdapter(
             }
         }
     }
+
 }

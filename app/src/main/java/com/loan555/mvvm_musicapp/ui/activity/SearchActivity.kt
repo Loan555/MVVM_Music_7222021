@@ -1,4 +1,4 @@
-package com.loan555.mvvm_musicapp.ui
+package com.loan555.mvvm_musicapp.ui.activity
 
 import android.app.Activity
 import android.content.Intent
@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
@@ -32,6 +33,8 @@ class SearchActivity : AppCompatActivity() {
         binding.viewModel = viewModel
 
         setSupportActionBar(binding.toolbar)
+        supportActionBar?.setHomeButtonEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
 
         binding.recyclerSearch.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -65,6 +68,13 @@ class SearchActivity : AppCompatActivity() {
             }
         })
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            this.finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private val onItemClick: (Int, List<SongCustom>) -> Unit = { pos, songs ->

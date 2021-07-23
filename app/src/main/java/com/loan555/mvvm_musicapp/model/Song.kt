@@ -11,11 +11,12 @@ import android.os.Build
 import android.os.Environment
 import android.util.Log
 import android.util.Size
+import android.widget.Toast
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import java.io.File
+import com.loan555.mvvm_musicapp.ui.fragment.myTag
 import java.io.IOException
 import java.io.Serializable
 import java.net.HttpURLConnection
@@ -30,12 +31,16 @@ class SongCustom(
     @ColumnInfo(name = "duration_col") var duration: Long,
     @ColumnInfo(name = "title_col") var title: String,
     @ColumnInfo(name = "uri_col") var uri: String,
-    @ColumnInfo(name= "favorite_col") var favorite: Boolean,
-    @ColumnInfo(name= "local_col") var isLocal: Boolean
+    @ColumnInfo(name = "favorite_col") var favorite: Boolean,
+    @ColumnInfo(name = "local_col") var isLocal: Boolean
 ) : Serializable {
     @PrimaryKey(autoGenerate = true)//tu dong khoi tao
     @ColumnInfo(name = "auto_id_col")
     var idRoom: Int = 0
+
+    override fun toString(): String {
+        return " id = $id /name = ${this.name} / artist = $artistsNames /thumbnail = $thumbnail /duration = $duration title = $title / uri = $uri"
+    }
 
     fun timeToString(): String {
         val sumSeconds = duration
@@ -80,34 +85,40 @@ class SongCustom(
     }
 
     fun downLoad(context: Context) {
-        var dir = Environment.DIRECTORY_MUSIC
-        dir += "/klp"
-        val fileDir = File(dir)
-        if (!fileDir.isDirectory) {
-            fileDir.mkdir()
-        }
-        // Download File
-        // Download File
-        val request = DownloadManager.Request(
-            Uri.parse(this.uri)
-        )
-        request.setDescription(this.name)
-        request.setTitle(this.title)
-        // in order for this if to run, you must use the android 3.2 to
-        // compile your app
-        // in order for this if to run, you must use the android 3.2 to
-        // compile your app
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            request.allowScanningByMediaScanner()
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        }
-        request.setDestinationInExternalPublicDir(dir, "nameFile.mp3")
+        try {
+            // Download File
+            val request = DownloadManager.Request(
+                Uri.parse(this.uri)
+            )
+            request.setDescription(this.name)
+            request.setTitle(this.title)
+            // in order for this if to run, you must use the android 3.2 to
+            // compile your app
+            // in order for this if to run, you must use the android 3.2 to
+            // compile your app
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                request.allowScanningByMediaScanner()
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            }
+            val subPath = "${this.title}-${this.id}.mp3"
+            request.setDestinationInExternalPublicDir(
+                Environment.DIRECTORY_MUSIC,
+                subPath
+            )
 
-        // get download service and enqueue file
+            // get download service and enqueue file
 
-        // get download service and enqueue file
-        val manager = context.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-        manager.enqueue(request)
+            // get download service and enqueue file
+            val manager = context.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+            manager.enqueue(request)
+            Toast.makeText(context, "Downloading... $subPath", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Log.e(
+                myTag,
+                "Download manager in Android: ${Build.VERSION.SDK_INT} not work! ${e.message}"
+            )
+            Toast.makeText(context, "Download error code: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 }
 

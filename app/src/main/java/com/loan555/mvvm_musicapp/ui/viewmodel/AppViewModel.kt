@@ -10,9 +10,13 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.util.Size
+import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.lifecycle.*
+import com.bumptech.glide.Glide
 import com.loan555.musicapplication.service.*
+import com.loan555.mvvm_musicapp.R
 import com.loan555.mvvm_musicapp.model.Playlist
 import com.loan555.mvvm_musicapp.model.SongCustom
 import com.loan555.mvvm_musicapp.repository.ChartRepository
@@ -115,6 +119,27 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 setImg(result.await())
             }
+        }
+    }
+
+    fun loadImg(context: Context, song: SongCustom, imgNote: ImageView) {
+        if (song.thumbnail != null) {
+            Glide.with(context).load(song.thumbnail).into(imgNote)
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                try {
+                    val thumb =
+                        context.applicationContext.contentResolver.loadThumbnail(
+                            Uri.parse(song.uri), Size(640, 480), null
+                        )
+                    val bitmap: Bitmap = thumb
+                    Glide.with(context).load(bitmap).into(imgNote)
+                } catch (e: IOException) {
+                    Log.e(myTag, "can't find bitmap: ${e.message}")
+                    Glide.with(context).load(R.drawable.musical_note_icon).into(imgNote)
+                }
+            } else
+                Glide.with(context).load(R.drawable.musical_note_icon).into(imgNote)
         }
     }
 
@@ -297,7 +322,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         _imgPlaying.value = bitmap
     }
 
-    private val _text = MutableLiveData<String>().apply { value = "" }
+    private val _text = MutableLiveData<String>().apply { value = "<Vuốt để làm mới>" }
     private val _size = MutableLiveData<String>().apply { value = "" }
     val playList = MutableLiveData<Playlist>().apply { value = null }
 

@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
-import androidx.viewpager.widget.ViewPager
 import com.loan555.musicapplication.service.MusicControllerService
 import com.loan555.mvvm_musicapp.R
 import com.loan555.mvvm_musicapp.ui.fragment.PlayFragment
