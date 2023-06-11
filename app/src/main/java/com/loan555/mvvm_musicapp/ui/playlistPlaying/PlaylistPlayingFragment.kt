@@ -12,7 +12,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.loan555.musicapplication.service.MusicControllerService
+import com.loan555.mvvm_musicapp.service.MusicControllerService
 import com.loan555.mvvm_musicapp.R
 import com.loan555.mvvm_musicapp.databinding.PlaylistPlayingFragmentBinding
 import com.loan555.mvvm_musicapp.model.Playlist

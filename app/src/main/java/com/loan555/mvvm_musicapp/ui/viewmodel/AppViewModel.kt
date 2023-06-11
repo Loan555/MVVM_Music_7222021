@@ -1,21 +1,23 @@
 package com.loan555.mvvm_musicapp.ui.viewmodel
 
 import android.app.Application
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.util.Size
-import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
-import com.loan555.musicapplication.service.*
 import com.loan555.mvvm_musicapp.R
 import com.loan555.mvvm_musicapp.model.Playlist
 import com.loan555.mvvm_musicapp.model.SongCustom
@@ -23,15 +25,20 @@ import com.loan555.mvvm_musicapp.repository.ChartRepository
 import com.loan555.mvvm_musicapp.repository.OfflineRepository
 import com.loan555.mvvm_musicapp.repository.RelatedRepository
 import com.loan555.mvvm_musicapp.repository.SongRepository
+import com.loan555.mvvm_musicapp.service.MusicControllerService
+import com.loan555.mvvm_musicapp.service.MusicControllerService.Companion.ACTION_BACK
+import com.loan555.mvvm_musicapp.service.MusicControllerService.Companion.ACTION_MUSIC
+import com.loan555.mvvm_musicapp.service.MusicControllerService.Companion.ACTION_NEXT
+import com.loan555.mvvm_musicapp.service.MusicControllerService.Companion.ACTION_PAUSE
+import com.loan555.mvvm_musicapp.service.MusicControllerService.Companion.ACTION_PLAY_PAUSE
+import com.loan555.mvvm_musicapp.service.MusicControllerService.Companion.ACTION_RESUME
+import com.loan555.mvvm_musicapp.service.MusicControllerService.Companion.KEY_ACTION_MUSIC
 import com.loan555.mvvm_musicapp.ui.fragment.myTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.lang.Exception
-import java.net.HttpURLConnection
-import java.net.URL
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val getApplication = application
@@ -148,10 +155,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             when (action) {
                 0 -> {
                 }
+
                 ACTION_PLAY_PAUSE -> {
                     if (mBinder.value!!.getService().player != null)
                         controlMusic(ACTION_PLAY_PAUSE)
                 }
+
                 ACTION_BACK, ACTION_NEXT -> {
                     if (mBinder.value!!.getService().player != null) {
                         controlMusic(action)
@@ -167,6 +176,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 mBinder.value?.getService()?.listPlaying, "Playing" -> {
 
                 }
+
                 else -> {
                     mBinder.value!!.getService().songs = list.songs as MutableList<SongCustom>
                     songsPlaying.value = list.songs

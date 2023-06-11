@@ -1,17 +1,14 @@
 package com.loan555.mvvm_musicapp.ui.fragment
 
 import android.app.AlertDialog
-import android.app.Dialog
-import android.app.Notification
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.loan555.mvvm_musicapp.R
@@ -19,11 +16,8 @@ import com.loan555.mvvm_musicapp.databinding.FavoritesFragmentBinding
 import com.loan555.mvvm_musicapp.model.Playlist
 import com.loan555.mvvm_musicapp.model.SongCustom
 import com.loan555.mvvm_musicapp.ui.activity.PlaySongActivity
-import com.loan555.mvvm_musicapp.ui.adapter.SongAdapter
 import com.loan555.mvvm_musicapp.ui.adapter.SongCustomAdapter_2
 import com.loan555.mvvm_musicapp.ui.viewmodel.AppViewModel
-import kotlinx.android.synthetic.main.item_view_note_adapter.*
-import java.lang.Exception
 
 class FavoritesFragment : Fragment() {
 
@@ -67,10 +61,10 @@ class FavoritesFragment : Fragment() {
 
 
     private fun initControl() {
-        viewModel.loadAllSongFavorite().observe(viewLifecycleOwner, {
+        viewModel.loadAllSongFavorite().observe(viewLifecycleOwner) {
             adapter.setSongs(it)
             binding.swipeRefresh.isRefreshing = false
-        })
+        }
         binding.recycleSong.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recycleSong.adapter = adapter
@@ -110,6 +104,7 @@ class FavoritesFragment : Fragment() {
                     }
                     builder.create().show()
                 }
+
                 R.id.popup_delete -> {
                     viewModel.deleteFavoriteSong(songs[pos])
                     viewModel.loadAllSongFavorite()

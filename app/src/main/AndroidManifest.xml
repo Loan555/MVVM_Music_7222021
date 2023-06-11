@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.loan555.mvvm_musicapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -19,14 +20,15 @@
         <activity
             android:name=".ui.activity.SearchActivity"
             android:label="Search"
-            android:parentActivityName=".ui.activity.MainActivity"></activity>
+            android:parentActivityName=".ui.activity.MainActivity" />
         <activity
             android:name=".ui.activity.PlaySongActivity"
             android:label="Play"
             android:parentActivityName=".ui.activity.MainActivity" />
         <activity
             android:name=".ui.activity.MainActivity"
-            android:label="Nhạc">
+            android:label="Nhạc"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

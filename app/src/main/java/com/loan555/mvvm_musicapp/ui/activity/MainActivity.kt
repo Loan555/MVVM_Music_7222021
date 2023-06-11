@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -12,17 +11,18 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
-import com.loan555.musicapplication.service.MusicControllerService
 import com.loan555.mvvm_musicapp.R
 import com.loan555.mvvm_musicapp.databinding.ActivityMainBinding
 import com.loan555.mvvm_musicapp.model.Playlist
 import com.loan555.mvvm_musicapp.model.SongCustom
+import com.loan555.mvvm_musicapp.service.MusicControllerService
 import com.loan555.mvvm_musicapp.ui.fragment.*
 import com.loan555.mvvm_musicapp.ui.viewmodel.AppViewModel
 
@@ -60,21 +60,21 @@ class MainActivity : AppCompatActivity() {
         initItemPlaying()
         initNavigation()
 
-        viewModel.getBinder().observe(this, {
+        viewModel.getBinder().observe(this) {
             if (it != null) {
                 Log.d(myTag, "onChange: connected to  service")
                 mService = it.getService()
-                mService!!.songPlaying.observe(this, { song ->
+                mService!!.songPlaying.observe(this) { song ->
                     viewModel.initViewSongPlaying(song)
-                })
-                mService!!.isPlaying.observe(this, { isPl ->
+                }
+                mService!!.isPlaying.observe(this) { isPl ->
                     viewModel.setIsPlaying(isPl)
-                })
+                }
             } else {
                 Log.d(myTag, "onChange: unbound from service")
                 mService = null
             }
-        })
+        }
 
     }
 
@@ -104,6 +104,7 @@ class MainActivity : AppCompatActivity() {
                 startSearchActivity()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
 
@@ -173,10 +174,12 @@ class MainActivity : AppCompatActivity() {
                         binding.navView.menu.findItem(R.id.navigation_offline).isChecked = true
                         supportActionBar?.setTitle(R.string.title_offline)
                     }
+
                     1 -> {
                         binding.navView.menu.findItem(R.id.navigation_chart).isChecked = true
                         supportActionBar?.setTitle(R.string.title_chart)
                     }
+
                     2 -> {
                         binding.navView.menu.findItem(R.id.navigation_favorite).isChecked = true
                         supportActionBar?.setTitle(R.string.title_favorite)
@@ -198,10 +201,12 @@ class MainActivity : AppCompatActivity() {
                     binding.viewPager.currentItem = 1
                     true
                 }
+
                 R.id.navigation_favorite -> {
                     binding.viewPager.currentItem = 2
                     true
                 }
+
                 else -> {
                     binding.viewPager.currentItem = 0
                     true
@@ -211,24 +216,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initItemPlaying() {
-        viewModel.visibility.observe(this, {
+        viewModel.visibility.observe(this) {
             if (it) binding.itemPlaying.visibility = View.VISIBLE
             else binding.itemPlaying.visibility = View.GONE
-        })
-        viewModel.imgPlaying.observe(this, {
+        }
+        viewModel.imgPlaying.observe(this) {
             binding.imgSong.setImageBitmap(it)
-        })
-        viewModel.isPlaying.observe(this, {
+        }
+        viewModel.isPlaying.observe(this) {
             if (it) binding.btnPlayPause.setImageResource(R.drawable.ic_pause)
             else binding.btnPlayPause.setImageResource(R.drawable.ic_play)
-        })
+        }
 
         binding.itemPlaying.setOnClickListener {
             val intent = Intent(this, PlaySongActivity::class.java)
             val mService = viewModel.mBinder.value?.getService()
             val bundle = Bundle()
             if (mService != null)
-                bundle.putSerializable("play", mService?.songs[mService?.songPos])
+                bundle.putSerializable("play", mService.songs[mService.songPos])
             intent.putExtra("play_playlist", bundle)
             startActivity(intent)
         }

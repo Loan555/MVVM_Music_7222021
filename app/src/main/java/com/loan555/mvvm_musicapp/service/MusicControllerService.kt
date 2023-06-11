@@ -1,4 +1,4 @@
-package com.loan555.musicapplication.service
+package com.loan555.mvvm_musicapp.service
 
 import android.app.PendingIntent
 import android.app.Service
@@ -10,7 +10,6 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Binder
-import android.os.Handler
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
@@ -19,25 +18,14 @@ import androidx.lifecycle.MutableLiveData
 import com.loan555.mvvm_musicapp.R
 import com.loan555.mvvm_musicapp.model.SongCustom
 import com.loan555.mvvm_musicapp.ui.fragment.myTag
-import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.IOException
-import java.lang.Runnable
 import kotlin.random.Random
 
-const val ACTION_PAUSE = -1
-const val ACTION_RESUME = 1
-const val ACTION_NEXT = 2
-const val ACTION_BACK = -2
-const val ACTION_PLAY = 3
-const val ACTION_STOP = -3
-const val ACTION_PLAY_PAUSE = 4
-
-const val CHANNEL_ID = "channel_music_app"
-const val ONGOING_NOTIFICATION_ID = 1
-const val ACTION_MUSIC = "android.intent.action.MY_MUSIC_ACTION"
-const val KEY_ACTION_MUSIC = "action_music"
-
-class MusicControllerService : Service() {
+class MusicControllerService : Service(), MediaPlayer.OnCompletionListener,
+    MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
+    MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener,
+    AudioManager.OnAudioFocusChangeListener {
     var isPlaying: MutableLiveData<Boolean> = MutableLiveData(true)
 
     /**
@@ -95,7 +83,7 @@ class MusicControllerService : Service() {
             this,
             ACTION_BACK,
             prevIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
         )
         val nextIntent = Intent(ACTION_MUSIC).apply {
             putExtra(KEY_ACTION_MUSIC, ACTION_NEXT)
@@ -104,7 +92,7 @@ class MusicControllerService : Service() {
             this,
             ACTION_NEXT,
             nextIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
         )
         val stopIntent = Intent(ACTION_MUSIC).apply {
             putExtra(KEY_ACTION_MUSIC, ACTION_STOP)
@@ -113,7 +101,7 @@ class MusicControllerService : Service() {
             this,
             ACTION_STOP,
             stopIntent,
-            PendingIntent.FLAG_CANCEL_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
         )
         val pauseIntent = Intent(ACTION_MUSIC).apply {
             putExtra(KEY_ACTION_MUSIC, ACTION_PLAY_PAUSE)
@@ -122,33 +110,33 @@ class MusicControllerService : Service() {
             this,
             ACTION_PLAY_PAUSE,
             pauseIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
         )
+        initMediaPlayer()
     }
 
     override fun onBind(intent: Intent?): IBinder? {
         Log.d(myTag, "service onBind")
-        val handler = Handler()
-        handler.postDelayed(object : Runnable {
-            override fun run() {
-                currentTime.value = getPos()
-                handler.postDelayed(this, 1000)
-                Log.d("timeHandler", "postDelayed timeHandler=  ${currentTime.value}")
-            }
-        }, 0)
+//        val handler = Handler()
+//        handler.postDelayed(object : Runnable {
+//            override fun run() {
+//                currentTime.value = getPos()
+//                handler.postDelayed(this, 1000)
+//            }
+//        }, 0)
         return binder
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(myTag, "service onStartCommand")
         val pendingIntent =
-            PendingIntent.getActivity(this, 0, intent, flags)
+            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val mediaSession = MediaSessionCompat(this, "tag")
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             // Show controls on lock screen even when user hides sensitive content.
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setContentTitle(songs[songPos].title)
-            .setContentText(songs[songPos].artistsNames)
+//            .setContentTitle(songs[songPos].title)
+//            .setContentText(songs[songPos].artistsNames)
             .setSmallIcon(R.drawable.ic_music_note)
             // Add media control buttons that invoke intents in your media service
             .addAction(
@@ -172,6 +160,7 @@ class MusicControllerService : Service() {
             .setContentIntent(pendingIntent)
             .build()
         startForeground(ONGOING_NOTIFICATION_ID, notification)
+        initMediaPlayer()
         return START_NOT_STICKY
     }
 
@@ -183,7 +172,7 @@ class MusicControllerService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        player?.release()
+        player?.reset()
         player = null
         listPlaying = ""
         unregisterReceiver(br)
@@ -196,7 +185,7 @@ class MusicControllerService : Service() {
         isPlaying.value = true
         songPos = position
         val uri: Uri = Uri.parse(songs[position].uri)
-        player?.release()
+        player?.reset()
         player = MediaPlayer().apply {
             setAudioStreamType(AudioManager.STREAM_MUSIC)
             try {
@@ -209,19 +198,6 @@ class MusicControllerService : Service() {
                 prepareAsync()
             } catch (e: IllegalStateException) {
                 Log.e("bbb", "error prepareAsync ${e.message}")
-            }
-            setOnPreparedListener {
-                Log.d("bbb", "music on setOnPreparedListener")
-                setOnCompletionListener {
-                    Log.d("bbb", "music on completion")
-                    playNextAuto()
-                }
-                start()
-            }
-            setOnErrorListener { mp, _, _ ->
-//                mp.reset()
-                Log.e("bbb", "error get setOnErrorListener")
-                false
             }
         }
         Intent(this, MusicControllerService::class.java).also {
@@ -237,22 +213,27 @@ class MusicControllerService : Service() {
             ACTION_PAUSE -> {
                 pausePlayer()
             }
+
             ACTION_RESUME -> {
                 resumePlayer()
             }
+
             ACTION_BACK -> {
                 playPrev()
             }
+
             ACTION_NEXT -> {
                 playNext()
             }
+
             ACTION_STOP -> {
                 stopSelf()
             }
+
             ACTION_PLAY_PAUSE -> {
                 when (isPng()) {
                     true -> handAction(ACTION_PAUSE)
-                    false -> handAction(ACTION_RESUME)
+                    else -> handAction(ACTION_RESUME)
                 }
             }
         }
@@ -266,7 +247,7 @@ class MusicControllerService : Service() {
         sendBroadcast(intent)
     }
 
-    private fun playPrev(): String? {
+    private fun playPrev(): String {
         songPos--
         if (songPos == -1) songPos = songs.size - 1;
         this.playSong(songPos)
@@ -306,7 +287,7 @@ class MusicControllerService : Service() {
             looping = false
             player?.isLooping = false
         }
-        Log.d(myTag, "state play = $statePlay")
+        Timber.d("state play = $statePlay")
     }
 
     private fun playNext() {
@@ -323,6 +304,7 @@ class MusicControllerService : Service() {
                     playSong(songPos)
                 }
             }
+
             else -> {
                 songPos++;
                 if (songPos == songs.size) songPos = 0
@@ -339,6 +321,7 @@ class MusicControllerService : Service() {
                     playSong(songPos)
                 } else sentMyBroadcast(ACTION_PAUSE)
             }
+
             2 -> {
                 var newPos = songPos
                 while (songs.size > 1 && newPos == songPos) {
@@ -351,16 +334,142 @@ class MusicControllerService : Service() {
                     playSong(songPos)
                 }
             }
+
             3 -> {
                 player?.isLooping = true
                 looping = true
                 player?.start()
             }
+
             else -> {
                 songPos++;
                 if (songPos == songs.size) songPos = 0
                 this.playSong(songPos)
             }
         }
+    }
+
+    private fun initMediaPlayer() {
+        if (player == null) player = MediaPlayer()
+        //Set up MediaPlayer event listeners
+        player?.setOnCompletionListener(this)
+        player?.setOnErrorListener(this)
+        player?.setOnPreparedListener(this)
+        player?.setOnBufferingUpdateListener(this)
+        player?.setOnSeekCompleteListener(this)
+        player?.setOnInfoListener(this)
+        //Reset so that the MediaPlayer is not pointing to another data source
+        player?.reset()
+        player?.setAudioStreamType(AudioManager.STREAM_MUSIC)
+        player?.setOnPreparedListener {
+            it.start()
+        }
+    }
+
+    fun stopMedia() {
+        if (player == null) return
+        if (player!!.isPlaying) {
+            player!!.stop()
+        }
+    }
+
+    override fun onCompletion(mp: MediaPlayer) {
+        //Invoked when playback of a media source has completed.
+        stopMedia();
+        //stop the service
+        stopSelf()
+    }
+
+    //Handle errors
+    override fun onError(mp: MediaPlayer, what: Int, extra: Int): Boolean {
+        //Invoked when there has been an error during an asynchronous operation.
+        when (what) {
+            MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK -> Log.d(
+                "MediaPlayer Error",
+                "MEDIA ERROR NOT VALID FOR PROGRESSIVE PLAYBACK $extra"
+            )
+
+            MediaPlayer.MEDIA_ERROR_SERVER_DIED -> Log.d(
+                "MediaPlayer Error",
+                "MEDIA ERROR SERVER DIED $extra"
+            )
+
+            MediaPlayer.MEDIA_ERROR_UNKNOWN -> Log.d(
+                "MediaPlayer Error",
+                "MEDIA ERROR UNKNOWN $extra"
+            )
+        }
+        return false
+    }
+
+    override fun onInfo(mp: MediaPlayer, what: Int, extra: Int): Boolean {
+        //Invoked to communicate some info.
+        Log.d(
+            "MediaPlayer onInfo",
+            "${mp.trackInfo}"
+        )
+        return false
+    }
+
+    fun playMedia() {
+        if (!player!!.isPlaying) {
+            player!!.start()
+        }
+    }
+
+    override fun onPrepared(mp: MediaPlayer) {
+        //Invoked when the media source is ready for playback.
+        playMedia();
+    }
+
+    override fun onSeekComplete(mp: MediaPlayer) {
+        //Invoked indicating the completion of a seek operation.
+    }
+
+    override fun onAudioFocusChange(focusState: Int) {
+        //Invoked when the audio focus of the system is updated.
+        when (focusState) {
+            AudioManager.AUDIOFOCUS_GAIN -> {
+                // resume playback
+                if (player == null) initMediaPlayer() else if (!player!!.isPlaying) player!!.start()
+                player!!.setVolume(1.0f, 1.0f)
+            }
+
+            AudioManager.AUDIOFOCUS_LOSS -> {
+                // Lost focus for an unbounded amount of time: stop playback and release media player
+                if (player!!.isPlaying) player!!.stop()
+                player!!.release()
+                player = null
+            }
+
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ->             // Lost focus for a short time, but we have to stop
+                // playback. We don't release the media player because playback
+                // is likely to resume
+                if (player!!.isPlaying) player!!.pause()
+
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK ->             // Lost focus for a short time, but it's ok to keep playing
+                // at an attenuated level
+                if (player!!.isPlaying) player!!.setVolume(0.1f, 0.1f)
+        }
+    }
+
+    override fun onBufferingUpdate(mp: MediaPlayer, percent: Int) {
+        //Invoked indicating buffering status of
+        //a media resource being streamed over the network.
+    }
+
+    companion object {
+        const val ACTION_PAUSE = -1
+        const val ACTION_RESUME = 1
+        const val ACTION_NEXT = 2
+        const val ACTION_BACK = -2
+        const val ACTION_PLAY = 3
+        const val ACTION_STOP = -3
+        const val ACTION_PLAY_PAUSE = 4
+        const val CHANNEL_ID = "channel_music_app"
+        const val ONGOING_NOTIFICATION_ID = 1
+        const val ACTION_MUSIC = "android.intent.action.MY_MUSIC_ACTION"
+        const val KEY_ACTION_MUSIC = "action_music"
+        const val URI_API = "http://api.mp3.zing.vn/api/streaming/audio/"
     }
 }
